@@ -26,16 +26,22 @@ class Todo extends Component {
   }
 
   handlePress() {
-    this.setState({
-      todos: [
-        ...this.state.todos,
-        {
-          name: this.state.newTodo
-        }
-      ],
-      newTodo: ""
-    });
+    fetch("http://localhost:3000/todos", {
+      method: "post",
+      body: JSON.stringify({
+        name: this.state.newTodo
+      }),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        const todos = [...this.state.todos, data];
+        this.setState({ todos, newTodo: "" });
+      });
   }
+
   handleDelete = index => {
     this.setState({
       todos: [
@@ -64,12 +70,7 @@ class Todo extends Component {
         <View style={styles.todoList}>
           {this.state.todos.map((todo, i) => (
             <View key={i} style={styles.todo}>
-              <Text style={styles.todoText}>
-                {todo.name}
-                <TouchableHighlight onPress={this.handleDelete.bind(this)}>
-                  <Text>Delete Item</Text>
-                </TouchableHighlight>
-              </Text>
+              <Text style={styles.todoText}>{todo.name}</Text>
             </View>
           ))}
         </View>
