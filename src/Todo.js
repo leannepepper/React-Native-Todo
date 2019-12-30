@@ -1,5 +1,8 @@
 import React from "react";
 import { Component } from "react";
+import { Provider } from "react-redux";
+//import { store } from "./store";
+//import { connect } from 'react-redux';
 import {
   StyleSheet,
   Text,
@@ -17,9 +20,10 @@ class Todo extends Component {
       todos: [],
       newTodo: ""
     };
+    this.handleDelete = this.handleDelete.bind(this);
   }
 
-  componentWillMount() {
+  componentDidMount() {
     fetch("http://localhost:3000/todos", {
       headers: {
         Accept: "application/json"
@@ -35,7 +39,7 @@ class Todo extends Component {
     });
   }
 
-  handlePress() {
+  handleAdd() {
     fetch("http://localhost:3000/todos", {
       method: "post",
       body: JSON.stringify({
@@ -53,11 +57,9 @@ class Todo extends Component {
   }
 
   handleDelete = index => {
+    const todos = this.state.todos.filter(todo => todo.id !== index);
     this.setState({
-      todos: [
-        ...this.state.todos.slice(0, index),
-        ...this.state.todos.slice(index + 1)
-      ]
+      todos: todos
     });
   };
 
@@ -72,15 +74,18 @@ class Todo extends Component {
           />
           <TouchableOpacity
             style={styles.button}
-            onPress={this.handlePress.bind(this)}
+            onPress={this.handleAdd.bind(this)}
           >
             <Text style={styles.buttonText}>Add Item</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.todoList}>
-          {this.state.todos.map((todo, i) => (
-            <View key={i} style={styles.todo}>
+          {this.state.todos.map((todo, key) => (
+            <View key={key} style={styles.todo}>
               <Text style={styles.todoText}>{todo.name}</Text>
+              <TouchableOpacity onPress={() => this.handleDelete(todo.id)}>
+                <Text>Delete</Text>
+              </TouchableOpacity>
             </View>
           ))}
         </View>
@@ -129,4 +134,9 @@ const styles = StyleSheet.create({
     fontSize: 24
   }
 });
+/*
+AppRegistry.registerComponent("Todo", () => (
+  <Provider store={store}>Todo</Provider>
+));
+*/
 AppRegistry.registerComponent("Todo", () => Todo);
